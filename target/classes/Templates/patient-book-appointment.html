@@ -203,6 +203,33 @@
             <div class="success-message" th:if="${message}" th:text="${message}"></div>
             <div class="error-message" th:if="${error}" th:text="${error}"></div>
 
+            <!-- SEARCH & FILTER SECTION -->
+            <div style="background: #f5f7ff; padding: 20px; border-radius: 10px; margin-bottom: 25px; border: 1px solid #e0e7ff;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 16px;">🔍 Search & Filter Doctors</h3>
+                
+                <!-- Filter by Specialization -->
+                <form method="get" action="/patient/book-appointment" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filter by Specialization:</label>
+                        <select name="specialization" onchange="this.form.submit()">
+                            <option value="">-- All Specializations --</option>
+                            <option th:each="spec : ${specializations}" th:value="${spec}" th:text="${spec}" th:selected="${selectedSpecialization == spec}"></option>
+                        </select>
+                    </div>
+                </form>
+
+                <!-- Search by Name -->
+                <form method="get" action="/patient/book-appointment" style="margin-bottom: 0;">
+                    <div class="form-group">
+                        <label>Search by Doctor Name:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" name="searchName" placeholder="Enter doctor name..." th:value="${searchName}" style="flex: 1; padding: 12px 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                            <button type="submit" style="padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.3s ease;">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
             <form method="post" action="/patient/book-appointment">
                 <div class="form-group">
                     <label>Select Doctor:</label>
@@ -221,7 +248,7 @@
             </form>
 
             <div class="form-info">
-                💡 Select a doctor and choose your preferred appointment time
+                💡 Filter doctors by specialization or search by name, then select preferred appointment time
             </div>
         </div>
     </div>

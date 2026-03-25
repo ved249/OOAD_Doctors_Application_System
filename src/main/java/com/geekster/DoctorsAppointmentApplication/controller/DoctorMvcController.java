@@ -1,9 +1,7 @@
 package com.geekster.DoctorsAppointmentApplication.controller;
 
-import com.geekster.DoctorsAppointmentApplication.model.Appointment;
-import com.geekster.DoctorsAppointmentApplication.model.Doctor;
-import com.geekster.DoctorsAppointmentApplication.service.DoctorService;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import com.geekster.DoctorsAppointmentApplication.model.Appointment;
+import com.geekster.DoctorsAppointmentApplication.model.Doctor;
+import com.geekster.DoctorsAppointmentApplication.service.DoctorService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/doctor")
@@ -67,6 +69,58 @@ public class DoctorMvcController {
             model.addAttribute("error", "Error loading appointments: " + e.getMessage());
             return "doctor-appointments";
         }
+    }
+
+    // ---------- APPROVE APPOINTMENT ----------
+    @PostMapping("/approve-appointment")
+    public String approveAppointment(
+            @RequestParam Long appointmentId,
+            @RequestParam String appointmentTime,
+            HttpSession session,
+            Model model
+    ) {
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            return "redirect:/doctor/login";
+        }
+
+        try {
+            java.time.LocalDateTime time = java.time.LocalDateTime.parse(appointmentTime);
+            com.geekster.DoctorsAppointmentApplication.model.AppointmentKey key = 
+                new com.geekster.DoctorsAppointmentApplication.model.AppointmentKey(appointmentId, time);
+            doctorService.approveAppointment(key);
+            model.addAttribute("message", "Appointment approved successfully!");
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to approve appointment: " + e.getMessage());
+        }
+
+        return "redirect:/doctor/appointments";
+    }
+
+    // ---------- REJECT APPOINTMENT ----------
+    @PostMapping("/reject-appointment")
+    public String rejectAppointment(
+            @RequestParam Long appointmentId,
+            @RequestParam String appointmentTime,
+            HttpSession session,
+            Model model
+    ) {
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            return "redirect:/doctor/login";
+        }
+
+        try {
+            java.time.LocalDateTime time = java.time.LocalDateTime.parse(appointmentTime);
+            com.geekster.DoctorsAppointmentApplication.model.AppointmentKey key = 
+                new com.geekster.DoctorsAppointmentApplication.model.AppointmentKey(appointmentId, time);
+            doctorService.rejectAppointment(key);
+            model.addAttribute("message", "Appointment rejected successfully!");
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to reject appointment: " + e.getMessage());
+        }
+
+        return "redirect:/doctor/appointments";
     }
 
     // ---------- LOGOUT ----------

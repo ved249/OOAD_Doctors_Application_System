@@ -1,22 +1,27 @@
 package com.geekster.DoctorsAppointmentApplication.service;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.geekster.DoctorsAppointmentApplication.dto.SignInInput;
 import com.geekster.DoctorsAppointmentApplication.dto.SignInOutput;
 import com.geekster.DoctorsAppointmentApplication.dto.SignUpInput;
 import com.geekster.DoctorsAppointmentApplication.dto.SignUpOutput;
+import com.geekster.DoctorsAppointmentApplication.model.Appointment;
 import com.geekster.DoctorsAppointmentApplication.model.AppointmentKey;
 import com.geekster.DoctorsAppointmentApplication.model.AuthenticationToken;
 import com.geekster.DoctorsAppointmentApplication.model.Doctor;
 import com.geekster.DoctorsAppointmentApplication.model.Patient;
+import com.geekster.DoctorsAppointmentApplication.model.Specialization;
 import com.geekster.DoctorsAppointmentApplication.repository.IPatientRepo;
-import jakarta.xml.bind.DatatypeConverter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-//import javax.xml.bind.DatatypeConverter;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import jakarta.xml.bind.DatatypeConverter;
 
 @Service
 public class PatientService {
@@ -157,6 +162,10 @@ public class PatientService {
     /**
      * Sign up a patient from MVC form
      */
+    /**
+     * Sign up new patient via MVC form
+     */
+    @Transactional
     public void signUpMvc(String firstName, String lastName, String email, String password, String contact) {
         Patient existingPatient = patientRepo.findFirstByPatientEmail(email);
         if (existingPatient != null) {
@@ -183,6 +192,13 @@ public class PatientService {
     }
 
     /**
+     * Get all appointments for a patient
+     */
+    public List<Appointment> getPatientAppointments(Long patientId) {
+        return appointmentService.getPatientAppointments(patientId);
+    }
+
+    /**
      * Book appointment from MVC form
      */
     public void bookAppointmentMvc(Long patientId, Long doctorId, String appointmentDateTime) {
@@ -191,5 +207,72 @@ public class PatientService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to book appointment: " + e.getMessage());
         }
+    }
+
+    /**
+     * Cancel appointment
+     */
+    @Transactional
+    public void cancelAppointmentMvc(Long patientId, Long appointmentId, LocalDateTime appointmentTime) {
+        // Verify the appointment belongs to this patient
+        AppointmentKey key = new AppointmentKey(appointmentId, appointmentTime);
+        Appointment appointment = appointmentService.getAppointmentById(key);
+        
+        if (!appointment.getPatient().getPatientId().equals(patientId)) {
+            throw new RuntimeException("You can only cancel your own appointments");
+        }
+        
+        appointmentService.cancelAppointment(key);
+    }
+
+    /**
+     * Reschedule appointment
+     */
+    public void rescheduleAppointmentMvc(Long patientId, Long appointmentId, LocalDateTime oldTime, String newDateTime) {
+        // Verify the appointment belongs to this patient
+        AppointmentKey oldKey = new AppointmentKey(appointmentId, oldTime);
+        Appointment appointment = appointmentService.getAppointmentById(oldKey);
+        
+        if (!appointment.getPatient().getPatientId().equals(patientId)) {
+            throw new RuntimeException("You can only reschedule your own appointments");
+        }
+        
+        appointmentService.rescheduleAppointment(oldKey, newDateTime);
+    }
+
+    /**
+     * Get upcoming appointments (after current time)
+     */
+    public List<Appointment> getUpcomingAppointments(Long patientId) {
+        return appointmentService.getUpcomingAppointments(patientId);
+    }
+
+    /**
+     * Get past appointments (before current time)
+     */
+    public List<Appointment> getPastAppointments(Long patientId) {
+        return appointmentService.getPastAppointments(patientId);
+    }
+
+    /**
+     * Filter doctors by specialization
+     */
+    public List<Doctor> getDoctorsBySpecialization(String specialization) {
+        if (specialization == null || specialization.trim().isEmpty()) {
+            return getAllDoctors();
+        }
+        try {
+            Specialization spec = Specialization.valueOf(specialization.toUpperCase());
+            return doctorService.getDoctorsBySpecialization(spec);
+        } catch (IllegalArgumentException e) {
+            return getAllDoctors();
+        }
+    }
+
+    /**
+     * Search doctors by name
+     */
+    public List<Doctor> searchDoctors(String name) {
+        return doctorService.searchDoctorsByName(name);
     }
 }

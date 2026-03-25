@@ -4,6 +4,7 @@ com\geekster\DoctorsAppointmentApplication\service\AppointmentService.class
 com\geekster\DoctorsAppointmentApplication\model\Specialization.class
 com\geekster\DoctorsAppointmentApplication\controller\AppointmentController.class
 com\geekster\DoctorsAppointmentApplication\model\Appointment.class
+com\geekster\DoctorsAppointmentApplication\model\DoctorAvailability.class
 com\geekster\DoctorsAppointmentApplication\repository\IDoctorRepo.class
 com\geekster\DoctorsAppointmentApplication\model\Patient.class
 com\geekster\DoctorsAppointmentApplication\DoctorAppApplication.class
@@ -18,9 +19,11 @@ com\geekster\DoctorsAppointmentApplication\controller\DoctorMvcController.class
 com\geekster\DoctorsAppointmentApplication\service\PatientService.class
 com\geekster\DoctorsAppointmentApplication\controller\PatientMvcController.class
 com\geekster\DoctorsAppointmentApplication\controller\PatientController.class
+com\geekster\DoctorsAppointmentApplication\model\AppointmentStatus.class
 com\geekster\DoctorsAppointmentApplication\repository\ITokenRepo.class
 com\geekster\DoctorsAppointmentApplication\dto\SignInInput.class
 com\geekster\DoctorsAppointmentApplication\repository\IPatientRepo.class
+com\geekster\DoctorsAppointmentApplication\repository\IDoctorAvailabilityRepo.class
 com\geekster\DoctorsAppointmentApplication\controller\WebController.class
 com\geekster\DoctorsAppointmentApplication\controller\HomeController.class
 com\geekster\DoctorsAppointmentApplication\controller\DoctorController.class

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Appointments - Doctor Appointment System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-link {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .message-box {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            border-left: 4px solid #28a745;
+            background: #d4edda;
+            color: #155724;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .appointments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .appointments-table th {
+            background: #f8f9ff;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e7ff;
+            font-size: 14px;
+        }
+
+        .appointments-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .appointments-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .doctor-info {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .time-info {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 90px;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-cancel {
+            background: #f5576c;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #d63447;
+            transform: translateY(-2px);
+        }
+
+        .btn-reschedule {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-reschedule:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .no-appointments {
+            text-align: center;
+            padding: 60px 30px;
+            color: #999;
+        }
+
+        .no-appointments-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-appointments-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .no-appointments-desc {
+            font-size: 14px;
+            color: #bbb;
+            margin-bottom: 30px;
+        }
+
+        .btn-book {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .btn-book:hover {
+            background: #5568d3;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 10px;
+            background: #f5576c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-confirm:hover {
+            background: #d63447;
+        }
+
+        .btn-cancel-modal {
+            flex: 1;
+            padding: 10px;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-cancel-modal:hover {
+            background: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>📅 My Appointments</h1>
+                <p>Hello, <span th:text="${patientName}"></span></p>
+            </div>
+            <div class="header-buttons">
+                <a href="/patient/book-appointment" class="btn-link">+ Book Appointment</a>
+                <a href="/patient/logout" class="btn-link">Logout</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="message-box" th:if="${message}" th:text="${message}"></div>
+            <div class="message-box error-message" th:if="${error}" th:text="${error}"></div>
+
+            <!-- FILTER SECTION -->
+            <div style="background: #f5f7ff; padding: 20px; border-radius: 10px; margin-bottom: 25px; border: 1px solid #e0e7ff;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 16px;">🔍 Filter Appointments</h3>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <a href="/patient/my-appointments" style="padding: 10px 20px; background: rgba(102, 126, 234, 0.2); color: #667eea; border: 2px solid #667eea; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer;">All Appointments</a>
+                    <a href="/patient/upcoming-appointments" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;">📌 Upcoming</a>
+                    <a href="/patient/past-appointments" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;">📜 Past</a>
+                </div>
+
+                <form method="get" action="/patient/appointments-by-date" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 150px;">
+                        <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500; font-size: 13px;">From Date:</label>
+                        <input type="date" name="startDate" th:value="${startDate}" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500; font-size: 13px;">To Date:</label>
+                        <input type="date" name="endDate" th:value="${endDate}" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    </div>
+                    <button type="submit" style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;">Filter</button>
+                </form>
+            </div>
+
+            <div th:if="${appointments != null and appointments.size() > 0}">
+                <table class="appointments-table">
+                    <thead>
+                        <tr>
+                            <th>Doctor Name</th>
+                            <th>Specialization</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="appointment : ${appointments}">
+                            <td class="doctor-info" th:text="${appointment.doctor.doctorName}"></td>
+                            <td th:text="${appointment.doctor.specialization.displayName}"></td>
+                            <td class="time-info" th:text="${#temporals.format(appointment.id.time, 'dd MMM yyyy, HH:mm')}"></td>
+                            <td>
+                                <span th:class="${'status-badge status-' + appointment.status.name().toLowerCase()}" 
+                                      th:text="${appointment.status.displayName}"></span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <form method="post" action="/patient/cancel-appointment" style="display:inline;">
+                                        <input type="hidden" name="appointmentId" th:value="${appointment.id.appointmentId}">
+                                        <input type="hidden" name="appointmentTime" th:value="${appointment.id.time}">
+                                        <button type="submit" class="btn-small btn-cancel" onclick="return confirm('Are you sure you want to cancel this appointment?')">Cancel</button>
+                                    </form>
+                                    <a href="#" class="btn-small btn-reschedule" 
+                                       th:href="@{/patient/reschedule-appointment(appointmentId=${appointment.id.appointmentId}, appointmentTime=${appointment.id.time})}">Reschedule</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${appointments == null or appointments.size() == 0}">
+                <div class="no-appointments">
+                    <div class="no-appointments-icon">📭</div>
+                    <div class="no-appointments-text">No Appointments Yet</div>
+                    <div class="no-appointments-desc">You haven't booked any appointments. Let's book one now!</div>
+                    <a href="/patient/book-appointment" class="btn-book">Book Your First Appointment</a>
+                </div>
+            </div>
+
+            <div class="back-link">
+                <a href="/">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

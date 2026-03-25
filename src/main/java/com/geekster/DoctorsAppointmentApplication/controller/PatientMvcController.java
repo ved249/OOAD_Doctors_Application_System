@@ -1,10 +1,7 @@
 package com.geekster.DoctorsAppointmentApplication.controller;
 
-import com.geekster.DoctorsAppointmentApplication.model.Doctor;
-import com.geekster.DoctorsAppointmentApplication.model.Patient;
-import com.geekster.DoctorsAppointmentApplication.service.DoctorService;
-import com.geekster.DoctorsAppointmentApplication.service.PatientService;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import com.geekster.DoctorsAppointmentApplication.model.Doctor;
+import com.geekster.DoctorsAppointmentApplication.model.Patient;
+import com.geekster.DoctorsAppointmentApplication.service.AppointmentService;
+import com.geekster.DoctorsAppointmentApplication.service.DoctorService;
+import com.geekster.DoctorsAppointmentApplication.service.PatientService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/patient")
@@ -24,6 +27,9 @@ public class PatientMvcController {
 
     @Autowired
     DoctorService doctorService;
+
+    @Autowired
+    AppointmentService appointmentService;
 
     // ---------- PATIENT SIGNUP PAGE ----------
     @GetMapping("/signup")
@@ -90,15 +96,31 @@ public class PatientMvcController {
 
     // ---------- BOOK APPOINTMENT PAGE ----------
     @GetMapping("/book-appointment")
-    public String bookAppointmentPage(HttpSession session, Model model) {
+    public String bookAppointmentPage(
+            @RequestParam(required = false) String specialization,
+            @RequestParam(required = false) String searchName,
+            HttpSession session, 
+            Model model) {
         Long patientId = (Long) session.getAttribute("patientId");
         if (patientId == null) {
             return "redirect:/patient/login";
         }
 
-        // Get all doctors for dropdown
-        List<Doctor> doctors = doctorService.getAllDoctors();
+        // Get doctors based on filter
+        List<Doctor> doctors;
+        if (specialization != null && !specialization.isEmpty()) {
+            doctors = patientService.getDoctorsBySpecialization(specialization);
+            model.addAttribute("selectedSpecialization", specialization);
+        } else if (searchName != null && !searchName.isEmpty()) {
+            doctors = patientService.searchDoctors(searchName);
+            model.addAttribute("searchName", searchName);
+        } else {
+            doctors = doctorService.getAllDoctors();
+        }
+
         model.addAttribute("doctors", doctors);
+        // Add all specializations for filter dropdown
+        model.addAttribute("specializations", com.geekster.DoctorsAppointmentApplication.model.Specialization.values());
         return "patient-book-appointment";
     }
 
@@ -124,6 +146,181 @@ public class PatientMvcController {
             model.addAttribute("error", "Failed to book appointment: " + e.getMessage());
             model.addAttribute("doctors", doctorService.getAllDoctors());
             return "patient-book-appointment";
+        }
+    }
+
+    // ---------- VIEW APPOINTMENTS PAGE ----------
+    @GetMapping("/my-appointments")
+    public String viewMyAppointments(HttpSession session, Model model) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return "redirect:/patient/login";
+        }
+
+        try {
+            List<com.geekster.DoctorsAppointmentApplication.model.Appointment> appointments = 
+                patientService.getPatientAppointments(patientId);
+            model.addAttribute("appointments", appointments);
+            model.addAttribute("patientName", session.getAttribute("patientName"));
+            return "patient-appointments";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading appointments: " + e.getMessage());
+            return "patient-appointments";
+        }
+    }
+
+    // ---------- CANCEL APPOINTMENT ----------
+    @PostMapping("/cancel-appointment")
+    public String cancelAppointment(
+            @RequestParam Long appointmentId,
+            @RequestParam String appointmentTime,
+            HttpSession session,
+            Model model
+    ) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return "redirect:/patient/login";
+        }
+
+        try {
+            java.time.LocalDateTime time = java.time.LocalDateTime.parse(appointmentTime);
+            patientService.cancelAppointmentMvc(patientId, appointmentId, time);
+            model.addAttribute("message", "Appointment cancelled successfully!");
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to cancel appointment: " + e.getMessage());
+        }
+
+        return "redirect:/patient/my-appointments";
+    }
+
+    // ---------- RESCHEDULE APPOINTMENT PAGE ----------
+    @GetMapping("/reschedule-appointment")
+    public String rescheduleAppointmentPage(
+            @RequestParam Long appointmentId,
+            @RequestParam String appointmentTime,
+            HttpSession session,
+            Model model
+    ) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return "redirect:/patient/login";
+        }
+
+        try {
+            List<Doctor> doctors = doctorService.getAllDoctors();
+            model.addAttribute("doctors", doctors);
+            model.addAttribute("appointmentId", appointmentId);
+            model.addAttribute("appointmentTime", appointmentTime);
+            return "patient-reschedule-appointment";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading reschedule form: " + e.getMessage());
+            return "patient-appointments";
+        }
+    }
+
+    // ---------- RESCHEDULE APPOINTMENT SUBMIT ----------
+    @PostMapping("/reschedule-appointment")
+    public String rescheduleAppointmentSubmit(
+            @RequestParam Long appointmentId,
+            @RequestParam String oldAppointmentTime,
+            @RequestParam String newAppointmentDateTime,
+            HttpSession session,
+            Model model
+    ) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return "redirect:/patient/login";
+        }
+
+        try {
+            java.time.LocalDateTime oldTime = java.time.LocalDateTime.parse(oldAppointmentTime);
+            patientService.rescheduleAppointmentMvc(patientId, appointmentId, oldTime, newAppointmentDateTime);
+            model.addAttribute("message", "Appointment rescheduled successfully!");
+            return "redirect:/patient/my-appointments";
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to reschedule appointment: " + e.getMessage());
+            List<Doctor> doctors = doctorService.getAllDoctors();
+            model.addAttribute("doctors", doctors);
+            model.addAttribute("appointmentId", appointmentId);
+            model.addAttribute("appointmentTime", oldAppointmentTime);
+            return "patient-reschedule-appointment";
+        }
+    }
+
+    // ---------- APPOINTMENT HISTORY & FILTERING ----------
+    @GetMapping("/upcoming-appointments")
+    public String viewUpcomingAppointments(HttpSession session, Model model) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return "redirect:/patient/login";
+        }
+
+        try {
+            List<com.geekster.DoctorsAppointmentApplication.model.Appointment> appointments = 
+                patientService.getUpcomingAppointments(patientId);
+            model.addAttribute("appointments", appointments);
+            model.addAttribute("appointmentType", "Upcoming");
+            model.addAttribute("patientName", session.getAttribute("patientName"));
+            return "patient-appointments";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading upcoming appointments: " + e.getMessage());
+            return "patient-appointments";
+        }
+    }
+
+    @GetMapping("/past-appointments")
+    public String viewPastAppointments(HttpSession session, Model model) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return "redirect:/patient/login";
+        }
+
+        try {
+            List<com.geekster.DoctorsAppointmentApplication.model.Appointment> appointments = 
+                patientService.getPastAppointments(patientId);
+            model.addAttribute("appointments", appointments);
+            model.addAttribute("appointmentType", "Past");
+            model.addAttribute("patientName", session.getAttribute("patientName"));
+            return "patient-appointments";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading past appointments: " + e.getMessage());
+            return "patient-appointments";
+        }
+    }
+
+    @GetMapping("/appointments-by-date")
+    public String filterAppointmentsByDate(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            HttpSession session,
+            Model model) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return "redirect:/patient/login";
+        }
+
+        try {
+            List<com.geekster.DoctorsAppointmentApplication.model.Appointment> appointments;
+            
+            if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+                java.time.LocalDateTime start = java.time.LocalDateTime.parse(startDate + "T00:00:00");
+                java.time.LocalDateTime end = java.time.LocalDateTime.parse(endDate + "T23:59:59");
+                appointments = appointmentService.getAppointmentsByDateRange(patientId, start, end);
+                model.addAttribute("filterApplied", true);
+                model.addAttribute("startDate", startDate);
+                model.addAttribute("endDate", endDate);
+            } else {
+                appointments = patientService.getPatientAppointments(patientId);
+                model.addAttribute("filterApplied", false);
+            }
+            
+            model.addAttribute("appointments", appointments);
+            model.addAttribute("appointmentType", "Filtered");
+            model.addAttribute("patientName", session.getAttribute("patientName"));
+            return "patient-appointments";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error filtering appointments: " + e.getMessage());
+            return "patient-appointments";
         }
     }
 
