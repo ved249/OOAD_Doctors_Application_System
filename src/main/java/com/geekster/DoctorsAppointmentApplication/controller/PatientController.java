@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+// @RestController  // Disabled: Use PatientMvcController instead
 @RequestMapping(value = "patient")
 public class PatientController {
 

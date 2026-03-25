@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Appointments - Doctor Appointment System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+            font-size: 14px;
+        }
+
+        .appointments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .appointments-table th {
+            background: #f8f9ff;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e7ff;
+            font-size: 14px;
+        }
+
+        .appointments-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .appointments-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .no-appointments {
+            text-align: center;
+            padding: 60px 30px;
+            color: #999;
+        }
+
+        .no-appointments-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-appointments-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .no-appointments-desc {
+            font-size: 14px;
+            color: #bbb;
+        }
+
+        .patient-info {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .time-info {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            color: #f5576c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>📅 My Appointments</h1>
+                <p>Hello, Dr. <span th:text="${doctorName}"></span></p>
+            </div>
+            <a href="/doctor/logout" class="logout-btn">Logout</a>
+        </div>
+
+        <div class="content">
+            <div class="error-message" th:if="${error}" th:text="${error}"></div>
+
+            <div th:if="${appointments != null and appointments.size() > 0}">
+                <table class="appointments-table">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Appointment Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="appointment : ${appointments}">
+                            <td class="patient-info" th:text="${appointment.patient.patientFirstName} + ' ' + ${appointment.patient.patientLastName}"></td>
+                            <td th:text="${appointment.patient.patientEmail}"></td>
+                            <td th:text="${appointment.patient.patientContact}"></td>
+                            <td class="time-info" th:text="${#temporals.format(appointment.id.time, 'dd MMM yyyy, HH:mm')}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${appointments == null or appointments.size() == 0}">
+                <div class="no-appointments">
+                    <div class="no-appointments-icon">📭</div>
+                    <div class="no-appointments-text">No Appointments</div>
+                    <div class="no-appointments-desc">You don't have any appointments scheduled yet</div>
+                </div>
+            </div>
+
+            <div class="back-link">
+                <a href="/">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

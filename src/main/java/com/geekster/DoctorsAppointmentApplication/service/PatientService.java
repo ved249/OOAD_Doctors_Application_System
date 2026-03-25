@@ -122,4 +122,74 @@ public class PatientService {
         appointmentService.cancelAppointment(key);
 
     }
+
+    /**
+     * Authenticate patient with email and password for MVC login
+     * @param email patient email
+     * @param password patient password (plain text)
+     * @return Patient object if credentials are valid, null otherwise
+     */
+    public Patient authenticatePatient(String email, String password) {
+        // Find patient by email
+        Patient patient = patientRepo.findFirstByPatientEmail(email);
+
+        if (patient == null) {
+            return null; // Patient not found
+        }
+
+        // Encrypt the provided password and compare with stored password
+        String encryptedPassword = null;
+        try {
+            encryptedPassword = encryptPassword(password);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        // Verify password matches
+        if (encryptedPassword.equals(patient.getPatientPassword())) {
+            return patient; // Authentication successful
+        }
+
+        return null; // Password mismatch
+    }
+
+    /**
+     * Sign up a patient from MVC form
+     */
+    public void signUpMvc(String firstName, String lastName, String email, String password, String contact) {
+        Patient existingPatient = patientRepo.findFirstByPatientEmail(email);
+        if (existingPatient != null) {
+            throw new IllegalStateException("Email already registered");
+        }
+
+        String encryptedPassword = null;
+        try {
+            encryptedPassword = encryptPassword(password);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Password encryption failed");
+        }
+
+        Patient newPatient = new Patient(firstName, lastName, email, encryptedPassword, contact);
+        patientRepo.save(newPatient);
+    }
+
+    /**
+     * Get patient by email
+     */
+    public Patient getPatientByEmail(String email) {
+        return patientRepo.findFirstByPatientEmail(email);
+    }
+
+    /**
+     * Book appointment from MVC form
+     */
+    public void bookAppointmentMvc(Long patientId, Long doctorId, String appointmentDateTime) {
+        try {
+            appointmentService.bookAppointmentMvc(patientId, doctorId, appointmentDateTime);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to book appointment: " + e.getMessage());
+        }
+    }
 }

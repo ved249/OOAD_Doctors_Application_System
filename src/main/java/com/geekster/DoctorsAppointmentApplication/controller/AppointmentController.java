@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+// @RestController  // Disabled: Use MVC controllers instead
 @RequestMapping("appointment")
 public class AppointmentController  {
 

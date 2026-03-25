@@ -14,4 +14,27 @@ public class AppointmentKey {
 
     public LocalDateTime time;
 
+    public AppointmentKey() {
+    }
+
+    public AppointmentKey(Long appointmentId, LocalDateTime time) {
+        this.appointmentId = appointmentId;
+        this.time = time;
+    }
+
+    public Long getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    public LocalDateTime getTime() {
+        return time;
+    }
+
+    public void setTime(LocalDateTime time) {
+        this.time = time;
+    }
 }
