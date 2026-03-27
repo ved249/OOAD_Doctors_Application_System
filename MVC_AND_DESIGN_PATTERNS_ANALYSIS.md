@@ -75,7 +75,13 @@ The **View** handles the presentation layer. It displays data to users without k
    - Shows doctors' perspective of appointments
    - Displays approve/reject buttons
 
-4. **patient-login.html, patient-signup.html**
+4. **doctor-view-patients.html** (New)
+   - Shows doctors' patient records from their appointments
+   - Displays patient name, email, and contact information
+   - Provides navigation back to appointments page
+   - Template variables: `${patients}`, `${doctorName}`
+
+5. **patient-login.html, patient-signup.html**
    - Authentication views
 
 **Thymeleaf Expression Examples:**
@@ -187,8 +193,26 @@ public class DoctorMvcController {
     @PostMapping("/login")
     public String doctorLoginSubmit(...) { ... }
     
-    @GetMapping("/my-appointments")
+    @GetMapping("/appointments")
     public String viewMyAppointments(...) { ... }
+    
+    @GetMapping("/patients")
+    public String viewMyPatients(HttpSession session, Model model) {
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            return "redirect:/doctor/login";
+        }
+        
+        try {
+            List<Patient> patients = doctorService.getMyPatients(doctorId);
+            model.addAttribute("patients", patients);
+            model.addAttribute("doctorName", session.getAttribute("doctorName"));
+            return "doctor-view-patients";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading patients: " + e.getMessage());
+            return "doctor-appointments";
+        }
+    }
 }
 ```
 

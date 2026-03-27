@@ -50,6 +50,7 @@ All requested features have been successfully implemented, integrated, and teste
 | View all appointments | ✅ | ✅ | doctor-appointments.html |
 | View patient details | ✅ | ✅ | Patient info displayed in table |
 | Approve / Reject appointment | ❌ | ✅ **NEW** | /doctor/approve-appointment endpoint |
+| View my patients | ❌ | ✅ **NEW** | /doctor/patients endpoint |
 
 ---
 
@@ -75,6 +76,7 @@ All requested features have been successfully implemented, integrated, and teste
 - ✅ **DoctorService**
   - approveAppointment()
   - rejectAppointment()
+  - getMyPatients()
 
 ### Controllers
 - ✅ **PatientMvcController** - 4 new endpoints
@@ -83,14 +85,16 @@ All requested features have been successfully implemented, integrated, and teste
   - GET /patient/reschedule-appointment
   - POST /patient/reschedule-appointment
 
-- ✅ **DoctorMvcController** - 2 new endpoints
+- ✅ **DoctorMvcController** - 3 new endpoints
   - POST /doctor/approve-appointment
   - POST /doctor/reject-appointment
+  - GET /doctor/patients
 
 ### Templates
 - ✅ **patient-appointments.html** - View appointments with status badges
 - ✅ **patient-reschedule-appointment.html** - Reschedule form
 - ✅ **doctor-appointments.html** - Enhanced with approve/reject buttons
+- ✅ **doctor-view-patients.html** - View patients from doctor's appointments
 
 ---
 
@@ -135,7 +139,11 @@ All requested features have been successfully implemented, integrated, and teste
    - Click REJECT → Status changes to REJECTED (red)
    - [Buttons disappear after action]
    ↓
-6. Logout → Session destroyed
+6. View My Patients → See all patients from my appointments
+   - Patient Name, Email, Contact
+   - Navigate back to appointments
+   ↓
+7. Logout → Session destroyed
 ```
 
 ---

@@ -141,10 +141,12 @@ public class PatientMvcController {
             patientService.bookAppointmentMvc(patientId, doctorId, appointmentDateTime);
             model.addAttribute("message", "Appointment booked successfully!");
             model.addAttribute("doctors", doctorService.getAllDoctors());
+            model.addAttribute("specializations", com.geekster.DoctorsAppointmentApplication.model.Specialization.values());
             return "patient-book-appointment";
         } catch (Exception e) {
             model.addAttribute("error", "Failed to book appointment: " + e.getMessage());
             model.addAttribute("doctors", doctorService.getAllDoctors());
+            model.addAttribute("specializations", com.geekster.DoctorsAppointmentApplication.model.Specialization.values());
             return "patient-book-appointment";
         }
     }

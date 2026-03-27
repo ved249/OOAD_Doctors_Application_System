@@ -79,6 +79,13 @@ You'll see the home page with two options:
    - Click **"Reject"** → Status becomes red ❌
 4. Already approved/rejected appointments show no buttons
 
+#### View My Patients (NEW!)
+1. Click **"👥 My Patients"** button in the header
+2. See table with patients from your appointments
+3. Columns: Patient Name, Email, Contact
+4. Only shows patients who have booked appointments with you
+5. Click **"← Appointments"** to go back
+
 #### Verify Status Changes
 1. Switch back to patient account
 2. Go to "My Appointments"
@@ -142,6 +149,8 @@ SELECT * FROM APPOINTMENT WHERE STATUS = 'APPROVED';
 - [x] Approve pending appointment (becomes green)
 - [x] Reject pending appointment (becomes red)
 - [x] Cannot modify already approved/rejected
+- [x] View my patients (NEW!)
+- [x] See patient records from my appointments
 - [x] Logout
 
 ---

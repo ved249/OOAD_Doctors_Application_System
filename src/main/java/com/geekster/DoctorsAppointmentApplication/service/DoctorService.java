@@ -5,15 +5,19 @@ import java.security.NoSuchAlgorithmException;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.geekster.DoctorsAppointmentApplication.dto.DoctorSignUpInput;
+import com.geekster.DoctorsAppointmentApplication.dto.DoctorSignUpOutput;
 import com.geekster.DoctorsAppointmentApplication.model.Appointment;
 import com.geekster.DoctorsAppointmentApplication.model.AppointmentKey;
 import com.geekster.DoctorsAppointmentApplication.model.Doctor;
 import com.geekster.DoctorsAppointmentApplication.model.DoctorAvailability;
+import com.geekster.DoctorsAppointmentApplication.model.Patient;
 import com.geekster.DoctorsAppointmentApplication.model.Specialization;
 import com.geekster.DoctorsAppointmentApplication.repository.IDoctorAvailabilityRepo;
 import com.geekster.DoctorsAppointmentApplication.repository.IDoctorRepo;
@@ -113,6 +117,32 @@ public class DoctorService {
         return myDoc.getAppointments();
     }
 
+    /**
+     * Doctor signup
+     */
+    public DoctorSignUpOutput doctorSignUp(DoctorSignUpInput signUpDto) {
+        // Check if doctor exists or not based on email
+        Doctor doctor = doctorRepo.findFirstByDoctorEmail(signUpDto.getDoctorEmail());
+
+        if (doctor != null) {
+            throw new IllegalStateException("Doctor already exists!!!!...sign in instead");
+        }
+
+        // Encryption
+        String encryptedPassword = null;
+        try {
+            encryptedPassword = encryptPassword(signUpDto.getDoctorPassword());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        doctor = new Doctor(signUpDto.getDoctorName(), signUpDto.getDoctorEmail(), encryptedPassword, signUpDto.getSpecialization());
+
+        doctorRepo.save(doctor);
+
+        return new DoctorSignUpOutput("Doctor registered", "Doctor created successfully");
+    }
+
     private String encryptPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
         md5.update(password.getBytes());
@@ -127,17 +157,22 @@ public class DoctorService {
      * @return Doctor object if credentials are valid, null otherwise
      */
     public Doctor authenticateDoctor(String email, String password) {
+        System.out.println("Authenticating doctor: " + email);
         // Find doctor by email
         Doctor doctor = doctorRepo.findFirstByDoctorEmail(email);
 
         if (doctor == null) {
+            System.out.println("Doctor not found for email: " + email);
             return null; // Doctor not found
         }
 
+        System.out.println("Doctor found: " + doctor.getDoctorName());
         // Encrypt the provided password and compare with stored password
         String encryptedPassword = null;
         try {
             encryptedPassword = encryptPassword(password);
+            System.out.println("Provided password hash: " + encryptedPassword);
+            System.out.println("Stored password hash: " + doctor.getDoctorPassword());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return null;
@@ -145,9 +180,11 @@ public class DoctorService {
 
         // Verify password matches
         if (encryptedPassword.equals(doctor.getDoctorPassword())) {
+            System.out.println("Authentication successful");
             return doctor; // Authentication successful
         }
 
+        System.out.println("Password mismatch");
         return null; // Password mismatch
     }
 
@@ -165,5 +202,19 @@ public class DoctorService {
     @Transactional
     public void rejectAppointment(AppointmentKey appointmentKey) {
         appointmentService.rejectAppointment(appointmentKey);
+    }
+
+    /**
+     * Get patients associated with this doctor (from appointments)
+     */
+    public List<Patient> getMyPatients(Long doctorId) {
+        Doctor doctor = doctorRepo.findByDoctorId(doctorId);
+        if (doctor == null) {
+            throw new IllegalStateException("Doctor not found");
+        }
+        return doctor.getAppointments().stream()
+            .map(Appointment::getPatient)
+            .distinct()
+            .collect(Collectors.toList());
     }
 }

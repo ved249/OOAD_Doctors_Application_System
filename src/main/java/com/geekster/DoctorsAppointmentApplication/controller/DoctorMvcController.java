@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.geekster.DoctorsAppointmentApplication.dto.DoctorSignUpInput;
+import com.geekster.DoctorsAppointmentApplication.dto.DoctorSignUpOutput;
 import com.geekster.DoctorsAppointmentApplication.model.Appointment;
+import com.geekster.DoctorsAppointmentApplication.model.Patient;
 import com.geekster.DoctorsAppointmentApplication.model.Doctor;
 import com.geekster.DoctorsAppointmentApplication.service.DoctorService;
 
@@ -50,6 +53,38 @@ public class DoctorMvcController {
         // Login failed - show error message
         model.addAttribute("error", "Invalid email or password. Please try again.");
         return "doctor-login";
+    }
+
+    // ---------- DOCTOR SIGNUP PAGE ----------
+    @GetMapping("/signup")
+    public String doctorSignupPage(Model model) {
+        model.addAttribute("specializations", com.geekster.DoctorsAppointmentApplication.model.Specialization.values());
+        return "doctor-signup";
+    }
+
+    // ---------- DOCTOR SIGNUP SUBMIT ----------
+    @PostMapping("/signup")
+    public String doctorSignupSubmit(
+            @RequestParam String doctorName,
+            @RequestParam String doctorEmail,
+            @RequestParam String doctorPassword,
+            @RequestParam com.geekster.DoctorsAppointmentApplication.model.Specialization specialization,
+            Model model
+    ) {
+        try {
+            DoctorSignUpInput signUpInput = new DoctorSignUpInput(doctorName, doctorEmail, doctorPassword, specialization);
+            DoctorSignUpOutput signUpOutput = doctorService.doctorSignUp(signUpInput);
+            model.addAttribute("message", signUpOutput.getMessage());
+            return "doctor-signup-success";
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("specializations", com.geekster.DoctorsAppointmentApplication.model.Specialization.values());
+            return "doctor-signup";
+        } catch (Exception e) {
+            model.addAttribute("error", "An error occurred during signup. Please try again.");
+            model.addAttribute("specializations", com.geekster.DoctorsAppointmentApplication.model.Specialization.values());
+            return "doctor-signup";
+        }
     }
 
     // ---------- VIEW DOCTOR APPOINTMENTS PAGE ----------
@@ -121,6 +156,25 @@ public class DoctorMvcController {
         }
 
         return "redirect:/doctor/appointments";
+    }
+
+    // ---------- VIEW MY PATIENTS ----------
+    @GetMapping("/patients")
+    public String viewMyPatients(HttpSession session, Model model) {
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            return "redirect:/doctor/login";
+        }
+
+        try {
+            List<Patient> patients = doctorService.getMyPatients(doctorId);
+            model.addAttribute("patients", patients);
+            model.addAttribute("doctorName", session.getAttribute("doctorName"));
+            return "doctor-view-patients";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading patients: " + e.getMessage());
+            return "doctor-appointments";
+        }
     }
 
     // ---------- LOGOUT ----------

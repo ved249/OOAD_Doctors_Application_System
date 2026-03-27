@@ -56,7 +56,12 @@
             opacity: 0.9;
         }
 
-        .logout-btn {
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .logout-btn, .patients-btn {
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
             color: white;
@@ -66,9 +71,11 @@
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .logout-btn:hover {
+        .logout-btn:hover, .patients-btn:hover {
             background: rgba(255, 255, 255, 0.3);
         }
 
@@ -248,7 +255,10 @@
                 <h1>📅 My Appointments</h1>
                 <p>Hello, Dr. <span th:text="${doctorName}"></span></p>
             </div>
-            <a href="/doctor/logout" class="logout-btn">Logout</a>
+            <div class="header-buttons">
+                <a href="/doctor/patients" class="patients-btn">👥 My Patients</a>
+                <a href="/doctor/logout" class="logout-btn">Logout</a>
+            </div>
         </div>
 
         <div class="content">
