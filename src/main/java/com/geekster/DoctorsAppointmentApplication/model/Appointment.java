@@ -20,7 +20,6 @@ import jakarta.persistence.OneToOne;
 )
 public class Appointment {
 
-    @Id
     @EmbeddedId
     private AppointmentKey id;
 
@@ -33,6 +32,10 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
+
+    private String diagnosis;
+    private String prescription;
+    private String doctorNotes;
 
     public Appointment() {
         this.status = AppointmentStatus.PENDING; // Default status
@@ -50,6 +53,17 @@ public class Appointment {
         this.doctor = doctor;
         this.patient = patient;
         this.status = status;
+    }
+
+    public Appointment(AppointmentKey id, Doctor doctor, Patient patient, AppointmentStatus status,
+                       String diagnosis, String prescription, String doctorNotes) {
+        this.id = id;
+        this.doctor = doctor;
+        this.patient = patient;
+        this.status = status;
+        this.diagnosis = diagnosis;
+        this.prescription = prescription;
+        this.doctorNotes = doctorNotes;
     }
 
     public AppointmentKey getId() {
@@ -82,5 +96,29 @@ public class Appointment {
 
     public void setStatus(AppointmentStatus status) {
         this.status = status;
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    public String getPrescription() {
+        return prescription;
+    }
+
+    public void setPrescription(String prescription) {
+        this.prescription = prescription;
+    }
+
+    public String getDoctorNotes() {
+        return doctorNotes;
+    }
+
+    public void setDoctorNotes(String doctorNotes) {
+        this.doctorNotes = doctorNotes;
     }
 }

@@ -137,6 +137,8 @@ SELECT * FROM APPOINTMENT WHERE STATUS = 'APPROVED';
 - [x] Book appointment with date/time
 - [x] View all my appointments with status
 - [x] See if appointment is Pending/Approved/Rejected
+- [x] View medical history with doctor notes and prescriptions
+- [x] Download my own appointment record
 - [x] Cancel my appointment
 - [x] Reschedule appointment to new date/time
 - [x] Logout
@@ -146,6 +148,10 @@ SELECT * FROM APPOINTMENT WHERE STATUS = 'APPROVED';
 - [x] View all patient appointments
 - [x] See patient details (name, email, phone)
 - [x] See appointment status (Pending/Approved/Rejected)
+- [x] Add medical notes after consultation
+- [x] Save diagnosis, prescriptions, and doctor notes
+- [x] View patient medical history across past appointments
+- [x] Download patient records for review
 - [x] Approve pending appointment (becomes green)
 - [x] Reject pending appointment (becomes red)
 - [x] Cannot modify already approved/rejected

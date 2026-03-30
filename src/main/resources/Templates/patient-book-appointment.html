@@ -396,7 +396,10 @@
                 setStep(2);
             } else if (currentStep === 2) {
                 setStep(3);
-                const today = new Date().toISOString().split('T')[0];
+                const now = new Date();
+                const today = now.getFullYear().toString().padStart(4, '0') + '-' +
+                    (now.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                    now.getDate().toString().padStart(2, '0');
                 document.getElementById('appointmentDateTime').setAttribute('min', today + 'T00:00');
             } else if (currentStep === 3) {
                 const dt = document.getElementById('appointmentDateTime').value;
@@ -415,10 +418,8 @@
                     showError('Missing required info');
                     return;
                 }
-                const d = new Date(dt);
-                const iso = d.toISOString().replace('Z', '');
                 document.getElementById('formDoctorId').value = selectedDoctorId;
-                document.getElementById('formDateTime').value = iso;
+                document.getElementById('formDateTime').value = dt;
                 document.getElementById('bookingForm').submit();
             }
         }

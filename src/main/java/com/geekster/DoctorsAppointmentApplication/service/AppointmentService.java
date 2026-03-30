@@ -84,12 +84,60 @@ public class AppointmentService {
      * Get all appointments for a patient
      */
     public List<Appointment> getPatientAppointments(Long patientId) {
+        if (!patientRepo.existsById(patientId)) {
+            throw new RuntimeException("Patient not found");
+        }
+        return appointmentRepo.findByPatientId(patientId);
+    }
+
+    public void saveAppointmentNotes(AppointmentKey appointmentKey, String diagnosis, String prescription, String doctorNotes) {
+        Appointment appointment = appointmentRepo.findById(appointmentKey)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        appointment.setDiagnosis(diagnosis);
+        appointment.setPrescription(prescription);
+        appointment.setDoctorNotes(doctorNotes);
+        appointmentRepo.save(appointment);
+    }
+
+    public List<Appointment> getDoctorAppointments(Long doctorId) {
+        Doctor doctor = doctorRepo.findByDoctorId(doctorId);
+        if (doctor == null) {
+            throw new RuntimeException("Doctor not found");
+        }
+        return doctor.getAppointments();
+    }
+
+    public String buildPatientHistoryExport(Long patientId) {
         Patient patient = patientRepo.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
-        
-        return appointmentRepo.findAll().stream()
-                .filter(apt -> apt.getPatient().getPatientId().equals(patientId))
-                .collect(Collectors.toList());
+
+        List<Appointment> appointments = appointmentRepo.findByPatientId(patientId);
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("Patient Record\n");
+        builder.append("Name: ").append(patient.getPatientFirstName()).append(" ")
+                .append(patient.getPatientLastName()).append("\n");
+        builder.append("Email: ").append(patient.getPatientEmail()).append("\n");
+        builder.append("Contact: ").append(patient.getPatientContact()).append("\n\n");
+        builder.append("Appointments:\n");
+
+        for (Appointment appointment : appointments) {
+            builder.append("- Appointment: ")
+                    .append(appointment.getId().getTime()).append("\n");
+            builder.append("  Doctor: ")
+                    .append(appointment.getDoctor().getDoctorName()).append(" (")
+                    .append(appointment.getDoctor().getSpecialization()).append(")\n");
+            builder.append("  Status: ").append(appointment.getStatus()).append("\n");
+            builder.append("  Diagnosis: ")
+                    .append(appointment.getDiagnosis() == null ? "N/A" : appointment.getDiagnosis()).append("\n");
+            builder.append("  Prescription: ")
+                    .append(appointment.getPrescription() == null ? "N/A" : appointment.getPrescription()).append("\n");
+            builder.append("  Notes: ")
+                    .append(appointment.getDoctorNotes() == null ? "N/A" : appointment.getDoctorNotes()).append("\n\n");
+        }
+
+        return builder.toString();
     }
 
     /**

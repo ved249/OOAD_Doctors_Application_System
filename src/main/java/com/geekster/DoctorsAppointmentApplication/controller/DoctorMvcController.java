@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.geekster.DoctorsAppointmentApplication.dto.DoctorSignUpInput;
 import com.geekster.DoctorsAppointmentApplication.dto.DoctorSignUpOutput;
 import com.geekster.DoctorsAppointmentApplication.model.Appointment;
+import com.geekster.DoctorsAppointmentApplication.model.AppointmentKey;
 import com.geekster.DoctorsAppointmentApplication.model.Patient;
 import com.geekster.DoctorsAppointmentApplication.model.Doctor;
 import com.geekster.DoctorsAppointmentApplication.service.DoctorService;
@@ -104,6 +105,103 @@ public class DoctorMvcController {
             model.addAttribute("error", "Error loading appointments: " + e.getMessage());
             return "doctor-appointments";
         }
+    }
+
+    // ---------- VIEW PATIENT HISTORY FOR DOCTOR ----------
+    @GetMapping("/history")
+    public String viewHistory(HttpSession session, Model model) {
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            return "redirect:/doctor/login";
+        }
+
+        try {
+            List<Appointment> appointments = doctorService.getMyPastAppointments(doctorId);
+            model.addAttribute("appointments", appointments);
+            model.addAttribute("doctorName", session.getAttribute("doctorName"));
+            return "doctor-history";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading history: " + e.getMessage());
+            return "doctor-appointments";
+        }
+    }
+
+    // ---------- ADD APPOINTMENT NOTES PAGE ----------
+    @GetMapping("/appointment-notes")
+    public String appointmentNotesPage(
+            @RequestParam Long appointmentId,
+            @RequestParam String appointmentTime,
+            HttpSession session,
+            Model model
+    ) {
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            return "redirect:/doctor/login";
+        }
+
+        try {
+            java.time.LocalDateTime time = java.time.LocalDateTime.parse(appointmentTime);
+            AppointmentKey key = new AppointmentKey(appointmentId, time);
+            Appointment appointment = doctorService.getMyAppointments(doctorId).stream()
+                    .filter(a -> a.getId().getAppointmentId().equals(appointmentId)
+                            && a.getId().getTime().equals(time))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+            model.addAttribute("appointment", appointment);
+            model.addAttribute("doctorName", session.getAttribute("doctorName"));
+            return "doctor-add-notes";
+        } catch (Exception e) {
+            model.addAttribute("error", "Unable to open notes form: " + e.getMessage());
+            return "redirect:/doctor/appointments";
+        }
+    }
+
+    // ---------- SAVE APPOINTMENT NOTES ----------
+    @PostMapping("/save-appointment-notes")
+    public String saveAppointmentNotes(
+            @RequestParam Long appointmentId,
+            @RequestParam String appointmentTime,
+            @RequestParam String diagnosis,
+            @RequestParam String prescription,
+            @RequestParam String doctorNotes,
+            HttpSession session,
+            Model model
+    ) {
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            return "redirect:/doctor/login";
+        }
+
+        try {
+            java.time.LocalDateTime time = java.time.LocalDateTime.parse(appointmentTime);
+            AppointmentKey key = new AppointmentKey(appointmentId, time);
+            doctorService.saveAppointmentNotes(key, diagnosis, prescription, doctorNotes);
+            model.addAttribute("message", "Medical notes saved successfully!");
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to save notes: " + e.getMessage());
+        }
+
+        return "redirect:/doctor/appointments";
+    }
+
+    // ---------- DOWNLOAD PATIENT DATA ----------
+    @GetMapping("/download-patient-data")
+    public org.springframework.http.ResponseEntity<byte[]> downloadPatientData(
+            @RequestParam Long patientId,
+            HttpSession session
+    ) {
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            return org.springframework.http.ResponseEntity.status(302).header("Location", "/doctor/login").build();
+        }
+
+        String report = doctorService.buildPatientReport(patientId);
+        byte[] content = report.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return org.springframework.http.ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=patient-records-" + patientId + ".txt")
+                .header("Content-Type", "text/plain; charset=UTF-8")
+                .body(content);
     }
 
     // ---------- APPROVE APPOINTMENT ----------

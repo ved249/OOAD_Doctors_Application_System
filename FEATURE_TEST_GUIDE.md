@@ -194,6 +194,38 @@
 
 ---
 
+### 6. **Medical History** ⭐ NEW!
+- **URL**: http://localhost:8080/patient/history
+- **What It Does**: Lets patients view their past appointments with doctor notes, diagnosis, and prescriptions
+- **Implementation**:
+  - `PatientMvcController.patientHistory()` NEW
+  - `PatientService.getPatientHistory()` NEW
+  - Reuses `patient-appointments.html` to display history details
+  - Shows read-only fields: Doctor, Date/Time, Status, Diagnosis, Prescription, Doctor Notes
+- **Test Steps**:
+  1. Login as patient
+  2. Click "View History"
+  3. Review past appointments with doctor notes and prescriptions
+  4. Verify records are read-only
+
+---
+
+### 7. **Download Patient Records** ⭐ NEW!
+- **URL**: http://localhost:8080/patient/download-history
+- **What It Does**: Downloads the logged-in patient’s own medical record export as a text file
+- **Implementation**:
+  - `PatientMvcController.downloadHistory()` NEW
+  - `PatientService.exportPatientHistory()` NEW
+  - `AppointmentService.buildPatientHistoryExport()` NEW
+  - Returns `text/plain` attachment for patient download
+- **Test Steps**:
+  1. Login as patient
+  2. Click "Download Records"
+  3. Verify browser downloads `patient-history-<id>.txt`
+  4. Open file and confirm appointments, diagnosis, prescription, and notes are included
+
+---
+
 ## 👨‍⚕️ DOCTOR FEATURES - COMPLETE IMPLEMENTATION
 
 ### 1. **Doctor Authentication**
@@ -292,6 +324,56 @@
   4. Confirm rejection dialog
   5. Status changes to "Rejected" (red)
   6. Approve/Reject buttons no longer shown
+
+---
+
+### 4. **Add Medical Notes** ⭐ NEW!
+- **URL**: http://localhost:8080/doctor/appointment-notes?appointmentId=...&appointmentTime=...
+- **What It Does**: Allows doctors to add a diagnosis, prescription, and consultation notes to an appointment
+- **Implementation**:
+  - `DoctorMvcController.appointmentNotesPage()` NEW
+  - `DoctorMvcController.saveAppointmentNotes()` NEW
+  - `DoctorService.saveAppointmentNotes()` NEW
+  - `AppointmentService.saveAppointmentNotes()` NEW
+  - Data saved to `Appointment` fields: `diagnosis`, `prescription`, `doctorNotes`
+- **Test Steps**:
+  1. Login as doctor
+  2. Open an appointment row
+  3. Click "Add Notes"
+  4. Enter diagnosis, prescription, and notes
+  5. Click "Save Notes"
+  6. Verify values appear in the appointment table
+
+---
+
+### 5. **Medical History - Doctor Side** ⭐ NEW!
+- **URL**: http://localhost:8080/doctor/history
+- **What It Does**: Lets doctors view full history for all past appointments, including notes and prescriptions
+- **Implementation**:
+  - `DoctorMvcController.viewHistory()` NEW
+  - `DoctorService.getMyPastAppointments()` NEW
+  - `doctor-history.html` NEW
+  - Displays patient, date, status, diagnosis, prescription, and notes
+- **Test Steps**:
+  1. Login as doctor
+  2. Click "Medical History"
+  3. Review past appointments and notes
+
+---
+
+### 6. **Download Patient Data** ⭐ NEW!
+- **URL**: http://localhost:8080/doctor/download-patient-data?patientId=...
+- **What It Does**: Downloads a patient record export for the selected patient
+- **Implementation**:
+  - `DoctorMvcController.downloadPatientData()` NEW
+  - `DoctorService.buildPatientReport()` NEW
+  - `AppointmentService.buildPatientHistoryExport()` NEW
+  - Returns `text/plain` attachment
+- **Test Steps**:
+  1. Login as doctor
+  2. Click "Download Patient Data" on a patient row
+  3. Verify `patient-records-<id>.txt` downloads
+  4. Verify diagnosis, prescriptions, and notes are present
 
 ---
 

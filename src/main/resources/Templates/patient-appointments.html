@@ -362,6 +362,8 @@
             </div>
             <div class="header-buttons">
                 <a href="/patient/book-appointment" class="btn-link">+ Book Appointment</a>
+                <a href="/patient/history" class="btn-link">📜 View History</a>
+                <a href="/patient/download-history" class="btn-link">⬇️ Download Records</a>
                 <a href="/patient/logout" class="btn-link">Logout</a>
             </div>
         </div>
@@ -401,6 +403,9 @@
                             <th>Specialization</th>
                             <th>Date & Time</th>
                             <th>Status</th>
+                            <th>Diagnosis</th>
+                            <th>Prescription</th>
+                            <th>Doctor Notes</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -413,9 +418,12 @@
                                 <span th:class="${'status-badge status-' + appointment.status.name().toLowerCase()}" 
                                       th:text="${appointment.status.displayName}"></span>
                             </td>
+                            <td th:text="${appointment.diagnosis != null ? appointment.diagnosis : '—'}"></td>
+                            <td th:text="${appointment.prescription != null ? appointment.prescription : '—'}"></td>
+                            <td th:text="${appointment.doctorNotes != null ? appointment.doctorNotes : '—'}"></td>
                             <td>
                                 <div class="action-buttons">
-                                    <form method="post" action="/patient/cancel-appointment" style="display:inline;">
+                                    <form method="post" action="/patient/cancel-appointment" style="display:inline;" th:if="${appointment.status.name() == 'PENDING'}">
                                         <input type="hidden" name="appointmentId" th:value="${appointment.id.appointmentId}">
                                         <input type="hidden" name="appointmentTime" th:value="${appointment.id.time}">
                                         <button type="submit" class="btn-small btn-cancel" onclick="return confirm('Are you sure you want to cancel this appointment?')">Cancel</button>

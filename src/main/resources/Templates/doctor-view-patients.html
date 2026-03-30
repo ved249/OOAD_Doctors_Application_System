@@ -162,9 +162,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 200px;">Patient Name</th>
-                            <th style="width: 200px;">Email</th>
-                            <th style="width: 150px;">Contact</th>
+                            <th style="width: 180px;">Patient Name</th>
+                            <th style="width: 220px;">Email</th>
+                            <th style="width: 170px;">Contact</th>
+                            <th style="width: 160px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,6 +173,9 @@
                             <td th:text="${patient.patientFirstName + ' ' + patient.patientLastName}">John Doe</td>
                             <td th:text="${patient.patientEmail}">john@example.com</td>
                             <td th:text="${patient.patientContact}">9876543210</td>
+                            <td>
+                                <a th:href="@{/doctor/download-patient-data(patientId=${patient.patientId})}" class="btn" style="background: #28a745;">Download Records</a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

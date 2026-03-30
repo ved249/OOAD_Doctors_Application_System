@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Medical Notes</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+        }
+        .message-box, .error-message {
+            padding: 15px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .message-box { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .error-message { background: #fee; color: #c33; border-left: 4px solid #c33; }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .form-group textarea {
+            min-height: 140px;
+        }
+        .submit-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s ease;
+        }
+        .submit-btn:hover {
+            background: #5568d3;
+        }
+        .appointment-summary {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background: #f9f9ff;
+        }
+        .summary-item {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+        .summary-item strong {
+            display: inline-block;
+            width: 120px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🩺 Add Medical Notes</h1>
+            <a href="/doctor/appointments">← Back</a>
+        </div>
+        <div class="content">
+            <div th:if="${message}" class="message-box" th:text="${message}"></div>
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+            <div class="appointment-summary" th:if="${appointment} != null">
+                <div class="summary-item"><strong>Patient:</strong> <span th:text="${appointment.patient.patientFirstName} + ' ' + ${appointment.patient.patientLastName}"></span></div>
+                <div class="summary-item"><strong>Email:</strong> <span th:text="${appointment.patient.patientEmail}"></span></div>
+                <div class="summary-item"><strong>Contact:</strong> <span th:text="${appointment.patient.patientContact}"></span></div>
+                <div class="summary-item"><strong>Date:</strong> <span th:text="${#temporals.format(appointment.id.time, 'dd MMM yyyy, HH:mm')}"></span></div>
+                <div class="summary-item"><strong>Status:</strong> <span th:text="${appointment.status.displayName}"></span></div>
+            </div>
+
+            <form method="post" action="/doctor/save-appointment-notes">
+                <input type="hidden" name="appointmentId" th:value="${appointment.id.appointmentId}" />
+                <input type="hidden" name="appointmentTime" th:value="${appointment.id.time}" />
+
+                <div class="form-group">
+                    <label for="diagnosis">Diagnosis</label>
+                    <input id="diagnosis" name="diagnosis" type="text" th:value="${appointment.diagnosis}" placeholder="Enter diagnosis" />
+                </div>
+                <div class="form-group">
+                    <label for="prescription">Prescription</label>
+                    <textarea id="prescription" name="prescription" placeholder="Enter prescription details" th:text="${appointment.prescription}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="doctorNotes">Doctor Notes</label>
+                    <textarea id="doctorNotes" name="doctorNotes" placeholder="Enter any additional notes" th:text="${appointment.doctorNotes}"></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Save Notes</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -41,6 +41,8 @@ All requested features have been successfully implemented, integrated, and teste
 | Cancel appointment | ❌ | ✅ **NEW** | /patient/cancel-appointment endpoint |
 | View appointment status | ❌ | ✅ **NEW** | AppointmentStatus enum with display |
 | Reschedule appointment | ❌ | ✅ **NEW** | /patient/reschedule-appointment endpoint |
+| View medical history | ❌ | ✅ **NEW** | /patient/history + appointment notes display |
+| Download patient records | ❌ | ✅ **NEW** | /patient/download-history endpoint |
 
 ### DOCTOR AUTHENTICATION & MANAGEMENT
 
@@ -50,6 +52,9 @@ All requested features have been successfully implemented, integrated, and teste
 | View all appointments | ✅ | ✅ | doctor-appointments.html |
 | View patient details | ✅ | ✅ | Patient info displayed in table |
 | Approve / Reject appointment | ❌ | ✅ **NEW** | /doctor/approve-appointment endpoint |
+| Add medical notes | ❌ | ✅ **NEW** | /doctor/appointment-notes + /doctor/save-appointment-notes |
+| View patient medical history | ❌ | ✅ **NEW** | /doctor/history endpoint |
+| Download patient records | ❌ | ✅ **NEW** | /doctor/download-patient-data endpoint |
 | View my patients | ❌ | ✅ **NEW** | /doctor/patients endpoint |
 
 ---

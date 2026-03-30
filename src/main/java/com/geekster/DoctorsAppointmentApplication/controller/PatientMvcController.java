@@ -326,6 +326,41 @@ public class PatientMvcController {
         }
     }
 
+    @GetMapping("/history")
+    public String patientHistory(HttpSession session, Model model) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return "redirect:/patient/login";
+        }
+
+        try {
+            List<com.geekster.DoctorsAppointmentApplication.model.Appointment> appointments = patientService.getPatientHistory(patientId);
+            model.addAttribute("appointments", appointments);
+            model.addAttribute("appointmentType", "History");
+            model.addAttribute("patientName", session.getAttribute("patientName"));
+            return "patient-appointments";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading medical history: " + e.getMessage());
+            return "patient-appointments";
+        }
+    }
+
+    @GetMapping("/download-history")
+    public org.springframework.http.ResponseEntity<byte[]> downloadHistory(HttpSession session) {
+        Long patientId = (Long) session.getAttribute("patientId");
+        if (patientId == null) {
+            return org.springframework.http.ResponseEntity.status(302).header("Location", "/patient/login").build();
+        }
+
+        String export = patientService.exportPatientHistory(patientId);
+        byte[] content = export.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        return org.springframework.http.ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=patient-history-" + patientId + ".txt")
+                .header("Content-Type", "text/plain; charset=UTF-8")
+                .body(content);
+    }
+
     // ---------- LOGOUT ----------
     @GetMapping("/logout")
     public String patientLogout(HttpSession session) {

@@ -117,6 +117,24 @@ public class DoctorService {
         return myDoc.getAppointments();
     }
 
+    public void saveAppointmentNotes(AppointmentKey appointmentKey, String diagnosis, String prescription, String doctorNotes) {
+        appointmentService.saveAppointmentNotes(appointmentKey, diagnosis, prescription, doctorNotes);
+    }
+
+    public List<Appointment> getMyPastAppointments(Long docId) {
+        Doctor doctor = doctorRepo.findByDoctorId(docId);
+        if (doctor == null) {
+            throw new IllegalStateException("Doctor not found");
+        }
+        return doctor.getAppointments().stream()
+                .filter(appointment -> appointment.getId().getTime().isBefore(java.time.LocalDateTime.now()))
+                .toList();
+    }
+
+    public String buildPatientReport(Long patientId) {
+        return appointmentService.buildPatientHistoryExport(patientId);
+    }
+
     /**
      * Doctor signup
      */

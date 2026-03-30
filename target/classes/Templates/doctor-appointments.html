@@ -17,13 +17,24 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             animation: slideUp 0.5s ease;
+        }
+        .content {
+            padding: 40px 30px;
+            overflow-x: auto;
+        }
+        .appointments-table {
+            min-width: 1100px;
+        }
+        .appointments-table td,
+        .appointments-table th {
+            white-space: nowrap;
         }
 
         @keyframes slideUp {
@@ -257,6 +268,7 @@
             </div>
             <div class="header-buttons">
                 <a href="/doctor/patients" class="patients-btn">👥 My Patients</a>
+                <a href="/doctor/history" class="patients-btn">📜 Medical History</a>
                 <a href="/doctor/logout" class="logout-btn">Logout</a>
             </div>
         </div>
@@ -274,6 +286,9 @@
                             <th>Contact</th>
                             <th>Appointment Date & Time</th>
                             <th>Status</th>
+                            <th>Diagnosis</th>
+                            <th>Prescription</th>
+                            <th>Notes</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -287,8 +302,13 @@
                                 <span th:class="${'status-badge status-' + appointment.status.name().toLowerCase()}" 
                                       th:text="${appointment.status.displayName}"></span>
                             </td>
+                            <td th:text="${appointment.diagnosis != null ? appointment.diagnosis : '—'}"></td>
+                            <td th:text="${appointment.prescription != null ? appointment.prescription : '—'}"></td>
+                            <td th:text="${appointment.doctorNotes != null ? appointment.doctorNotes : '—'}"></td>
                             <td>
                                 <div class="action-buttons">
+                                    <a th:href="@{/doctor/appointment-notes(appointmentId=${appointment.id.appointmentId}, appointmentTime=${appointment.id.time})}" class="btn-small btn-approve">Add Notes</a>
+                                    <a th:href="@{/doctor/download-patient-data(patientId=${appointment.patient.patientId})}" class="btn-small btn-reschedule">Download Patient Data</a>
                                     <form method="post" action="/doctor/approve-appointment" style="display:inline;" th:if="${appointment.status.name() == 'PENDING'}">
                                         <input type="hidden" name="appointmentId" th:value="${appointment.id.appointmentId}">
                                         <input type="hidden" name="appointmentTime" th:value="${appointment.id.time}">
@@ -299,7 +319,6 @@
                                         <input type="hidden" name="appointmentTime" th:value="${appointment.id.time}">
                                         <button type="submit" class="btn-small btn-reject" onclick="return confirm('Are you sure you want to reject this appointment?')">Reject</button>
                                     </form>
-                                    <span th:if="${appointment.status.name() != 'PENDING'}" style="color: #999; font-size: 12px;">—</span>
                                 </div>
                             </td>
                         </tr>

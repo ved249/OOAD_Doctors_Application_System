@@ -198,6 +198,14 @@ public class PatientService {
         return appointmentService.getPatientAppointments(patientId);
     }
 
+    public List<Appointment> getPatientHistory(Long patientId) {
+        return appointmentService.getPastAppointments(patientId);
+    }
+
+    public String exportPatientHistory(Long patientId) {
+        return appointmentService.buildPatientHistoryExport(patientId);
+    }
+
     /**
      * Book appointment from MVC form
      */
