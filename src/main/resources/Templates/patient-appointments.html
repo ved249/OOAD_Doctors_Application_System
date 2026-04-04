@@ -9,9 +9,7 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #F0F8FF;
             min-height: 100vh;
             padding: 20px;
         }
@@ -38,7 +36,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0056B3;
             padding: 30px;
             color: white;
             display: flex;
@@ -144,7 +142,7 @@
         }
 
         .time-info {
-            color: #667eea;
+            color: #0056B3;
             font-weight: 600;
         }
 
@@ -195,7 +193,7 @@
         }
 
         .btn-cancel {
-            background: #f5576c;
+            background: #0056B3;
             color: white;
         }
 
@@ -205,7 +203,7 @@
         }
 
         .btn-reschedule {
-            background: #667eea;
+            background: #0056B3;
             color: white;
         }
 
@@ -238,7 +236,7 @@
         }
 
         .btn-book {
-            background: #667eea;
+            background: #0056B3;
             color: white;
             padding: 12px 30px;
             text-decoration: none;
@@ -257,7 +255,7 @@
         }
 
         .back-link a {
-            color: #667eea;
+            color: #0056B3;
             text-decoration: none;
             font-weight: 600;
         }
@@ -325,7 +323,7 @@
         .btn-confirm {
             flex: 1;
             padding: 10px;
-            background: #f5576c;
+            background: #0056B3;
             color: white;
             border: none;
             border-radius: 6px;
@@ -377,9 +375,9 @@
                 <h3 style="color: #333; margin-bottom: 15px; font-size: 16px;">🔍 Filter Appointments</h3>
                 
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-                    <a href="/patient/my-appointments" style="padding: 10px 20px; background: rgba(102, 126, 234, 0.2); color: #667eea; border: 2px solid #667eea; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer;">All Appointments</a>
-                    <a href="/patient/upcoming-appointments" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;">📌 Upcoming</a>
-                    <a href="/patient/past-appointments" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;">📜 Past</a>
+                    <a href="/patient/my-appointments" style="padding: 10px 20px; background: rgba(102, 126, 234, 0.2); color: #0056B3; border: 2px solid #0056B3; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer;">All Appointments</a>
+                    <a href="/patient/upcoming-appointments" style="padding: 10px 20px; background: #0056B3; color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;">📌 Upcoming</a>
+                    <a href="/patient/past-appointments" style="padding: 10px 20px; background: #0056B3; color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;">📜 Past</a>
                 </div>
 
                 <form method="get" action="/patient/appointments-by-date" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
@@ -391,7 +389,7 @@
                         <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500; font-size: 13px;">To Date:</label>
                         <input type="date" name="endDate" th:value="${endDate}" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
                     </div>
-                    <button type="submit" style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;">Filter</button>
+                    <button type="submit" style="padding: 10px 24px; background: #0056B3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;">Filter</button>
                 </form>
             </div>
 
@@ -453,3 +451,9 @@
     </div>
 </body>
 </html>
+
+
+
+
+
+
