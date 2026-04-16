@@ -52,6 +52,10 @@ public class Patient {
 - Manages doctor's available time slots
 - Links to Doctor via @ManyToOne relationship
 
+5. **Admin.java**
+- Represents admin users who can manage doctors, appointments, and patients
+- Used for admin authentication and dashboard access
+
 #### **B) VIEW LAYER**
 The **View** handles the presentation layer. It displays data to users without knowing business logic.
 
@@ -81,7 +85,14 @@ The **View** handles the presentation layer. It displays data to users without k
    - Provides navigation back to appointments page
    - Template variables: `${patients}`, `${doctorName}`
 
-5. **patient-login.html, patient-signup.html**
+5. **admin-login.html, admin-dashboard.html, admin-view-doctors.html, admin-add-doctor.html, admin-edit-doctor.html, admin-view-appointments.html, admin-view-patients.html**
+   - Admin login and dashboard views
+   - Doctor management: view, add, edit, delete doctors
+   - Appointment monitoring: view all appointments
+   - Patient management: view and delete patient records
+   - Template variables: `${doctors}`, `${patients}`, `${appointments}`, `${doctorCount}`, `${patientCount}`, `${appointmentCount}`
+
+6. **patient-login.html, patient-signup.html**
    - Authentication views
 
 **Thymeleaf Expression Examples:**
@@ -216,14 +227,60 @@ public class DoctorMvcController {
 }
 ```
 
-3. **HomeController.java**
+3. **AdminMvcController.java**
+```java
+@Controller
+@RequestMapping("/admin")
+public class AdminMvcController {
+    @GetMapping("/login")
+    public String adminLoginPage() { ... }
+    
+    @PostMapping("/login")
+    public String adminLoginSubmit(...) { ... }
+    
+    @GetMapping("/dashboard")
+    public String adminDashboard(...) { ... }
+    
+    @GetMapping("/doctors")
+    public String viewAllDoctors(...) { ... }
+    
+    @GetMapping("/add-doctor")
+    public String addDoctorPage(...) { ... }
+    
+    @PostMapping("/add-doctor")
+    public String addDoctorSubmit(...) { ... }
+    
+    @GetMapping("/edit-doctor")
+    public String editDoctorPage(...) { ... }
+    
+    @PostMapping("/edit-doctor")
+    public String editDoctorSubmit(...) { ... }
+    
+    @PostMapping("/delete-doctor")
+    public String deleteDoctor(...) { ... }
+    
+    @GetMapping("/appointments")
+    public String viewAllAppointments(...) { ... }
+    
+    @GetMapping("/patients")
+    public String viewAllPatients(...) { ... }
+    
+    @PostMapping("/delete-patient")
+    public String deletePatient(...) { ... }
+    
+    @GetMapping("/logout")
+    public String adminLogout(...) { ... }
+}
+```
+
+4. **HomeController.java**
    - Handles home page and welcome screen
 
 **Key MVC Features in Your Application:**
 
 | Component | Responsibility | Implementation |
 |-----------|-----------------|-----------------|
-| **Model** | Data representation & persistence | Patient, Doctor, Appointment, DoctorAvailability entities with JPA |
+| **Model** | Data representation & persistence | Patient, Doctor, Appointment, DoctorAvailability, Admin entities with JPA |
 | **View** | User interface & presentation | Thymeleaf HTML templates with CSS styling |
 | **Controller** | Request handling & orchestration | @Controller classes with @GetMapping/@PostMapping handlers |
 
